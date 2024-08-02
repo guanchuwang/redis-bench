@@ -5,13 +5,13 @@ This is the official codebase of paper _Assessing and Enhancing Large Language M
 
 
 ## Resources
-:star2: Please star our repo to follow the latest updates on ReDis-QA-Bench!
+:star2: Please star our repo to follow the latest updates on ReDis-QA-Bench <img width="15" height="15" src="./figures/logo.png">!
 
 :mega: We have released our [paper]() and source code of ReDis-QA-Bench!
 
 :orange_book: We have released our benchmark dataset [ReDis-QA]()!
 
-:closed_book: We have released our corpus for RAG [ReCOP]() <img width="15" height="15" src="./figures/logo.png">!
+:closed_book: We have released our corpus for RAG [ReCOP]()!
 
 :blue_book: Baseline corpus refers to [PubMed](https://huggingface.co/datasets/MedRAG/pubmed), [Textbook](https://huggingface.co/datasets/MedRAG/textbooks), [Wikipedia](https://huggingface.co/datasets/MedRAG/wikipedia) and [StatPearls](https://huggingface.co/datasets/MedRAG/statpearls)!
 
