@@ -61,9 +61,6 @@ bash ./scripts/run_exp.sh
 
 The accuracy of RAG with ReCOP corpus is shown as follows:
 
-<img width="200" height="200" src="./figures/radar_Mistral-7B-v0.2.png">
-<img width="200" height="200" src="./figures/radar_Gemma-1.1-7B.png">
-<img width="200" height="200" src="./figures/radar_Phi-3-7B.png">
-<img width="200" height="200" src="./figures/radar_Qwen-2-7B.png">
+<img width="200" height="200" src="./figures/radar_Mistral-7B-v0.2.png"><img width="200" height="200" src="./figures/radar_Gemma-1.1-7B.png"><img width="200" height="200" src="./figures/radar_Phi-3-7B.png"><img width="200" height="200" src="./figures/radar_Qwen-2-7B.png">
 
 
