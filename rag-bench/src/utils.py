@@ -1,3 +1,18 @@
+"""
+This code is built upon the MedRAG codebase.
+
+Original source:
+@article{xiong2024benchmarking,
+  title={Benchmarking retrieval-augmented generation for medicine},
+  author={Xiong, Guangzhi and Jin, Qiao and Lu, Zhiyong and Zhang, Aidong},
+  journal={arXiv preprint arXiv:2402.13178},
+  year={2024}
+}
+
+GitHub repository:
+https://github.com/Teddy-XiongGZ/MedRAG
+"""
+
 from sentence_transformers.models import Transformer, Pooling
 from sentence_transformers import SentenceTransformer
 import os

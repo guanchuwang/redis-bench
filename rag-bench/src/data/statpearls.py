@@ -1,3 +1,17 @@
+"""
+This script is sourced from the MedRAG repository.
+
+Original source:
+https://github.com/Teddy-XiongGZ/MedRAG
+
+@article{xiong2024benchmarking,
+  title={Benchmarking retrieval-augmented generation for medicine},
+  author={Xiong, Guangzhi and Jin, Qiao and Lu, Zhiyong and Zhang, Aidong},
+  journal={arXiv preprint arXiv:2402.13178},
+  year={2024}
+}
+"""
+
 import os
 import json
 import tqdm

@@ -1,9 +1,24 @@
+"""
+This code is built upon the MedRAG codebase.
+
+Original source:
+@article{xiong2024benchmarking,
+  title={Benchmarking retrieval-augmented generation for medicine},
+  author={Xiong, Guangzhi and Jin, Qiao and Lu, Zhiyong and Zhang, Aidong},
+  journal={arXiv preprint arXiv:2402.13178},
+  year={2024}
+}
+
+GitHub repository:
+https://github.com/Teddy-XiongGZ/MedRAG
+"""
+
 import os
 import json
 from tqdm import tqdm
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
-from .utils import RetrievalSystem
+from utils import RetrievalSystem
 from datasets import load_from_disk
 from sklearn.metrics import accuracy_score
 
@@ -12,9 +27,8 @@ from sklearn.metrics import accuracy_score
 
 class MedRAG:
 
-    def __init__(self, llm_name=None, rag=True, retriever_name="MedCPT", corpus_name="Textbooks", db_dir="./corpus", cache_dir=None, hf_access_token="Your HF access token"):
+    def __init__(self, llm_name=None, retriever_name="MedCPT", corpus_name="Textbooks", db_dir="./corpus", cache_dir=None, hf_access_token="Your HF access token"):
         self.llm_name = llm_name
-        self.rag = rag
         self.retriever_name = retriever_name
         self.corpus_name = corpus_name
         self.db_dir = db_dir
@@ -22,15 +36,7 @@ class MedRAG:
         self.access_token = hf_access_token
         self.system_prompt_without_rag = "You are a helpful medical expert, and your task is to answer a multi-choice medical question. Please first choose the answer from the provided options and then provide the explanation."
         self.system_prompt_with_rag = "You are a helpful medical expert, and your task is to answer a multi-choice medical question using the relevant documents. Please first choose the answer from the provided options and then provide the explanation."
-
-        if rag:
-            self.retrieval_system = RetrievalSystem(self.retriever_name, self.corpus_name, self.db_dir)
-           
-        else:
-            self.retrieval_system = None
-
-
-        
+        self.retrieval_system = RetrievalSystem(self.retriever_name, self.corpus_name, self.db_dir)
         self.tokenizer = AutoTokenizer.from_pretrained(self.llm_name, cache_dir=self.cache_dir, token=self.access_token, trust_remote_code=True)
         self.tokenizer.padding_side = "left"
 
@@ -123,92 +129,55 @@ class MedRAG:
         k (int): number of snippets to retrieve
         '''
         question = question_doc["input"]
-        keyword = question_doc["rare disease"]
         context = ""
         contexts_valid = []
         # retrieve relevant snippets
-        if self.rag:
-            retrieved_snippets, scores = self.retrieval_system.retrieve(question, k=k)
-            contexts = ["Document [{:d}] (Title: {:s}) {:s}".format(idx, retrieved_snippets[idx]["title"], retrieved_snippets[idx]["content"]) for idx in range(len(retrieved_snippets))]
-    
-            contexts_valid = []
-            if len(contexts) == 0:
-                contexts_valid = [""]              
-            else:
-                for idx, doc in enumerate(contexts):
-                    token_num = self.num_tokens("\n".join(contexts[:idx+1]))
-                    if token_num > (self.context_length):
-                        break
-                    contexts_valid.insert(0,doc)
-            context = "\n\n".join([doc for doc in contexts_valid])
-             
+        retrieved_snippets, scores = self.retrieval_system.retrieve(question, k=k)
+        contexts = ["Document [{:d}] (Title: {:s}) {:s}".format(idx, retrieved_snippets[idx]["title"], retrieved_snippets[idx]["content"]) for idx in range(len(retrieved_snippets))]
+
+        contexts_valid = []
+        if len(contexts) == 0:
+            contexts_valid = [""]              
         else:
-            retrieved_snippets = []
-            scores = []
+            for idx, doc in enumerate(contexts):
+                token_num = self.num_tokens("\n".join(contexts[:idx+1]))
+                if token_num > (self.context_length):
+                    break
+                contexts_valid.insert(0,doc)
+        context = "\n\n".join([doc for doc in contexts_valid])
+             
+        
             
 
         # generate answers
-        if not self.rag:
-            if "gemma-1" in self.llm_name.lower():
-                prompt = [{"role": "user", "content": question[:-7]}] + \
-                [{"role": "assistant", "content": "Answer: <b>"}]
-                prompt_in_template = self.tokenizer.apply_chat_template(prompt, tokenize=False)[:-len("<end_of_turn>\n")]
+        if "gemma-1" in self.llm_name.lower():
+            prompt_in_template = "<bos><start_of_turn>system\n" + self.system_prompt_with_rag + "<end_of_turn>\n" + \
+                    "<start_of_turn>user\n" + context + "<end_of_turn>\n" + \
+                    "<start_of_turn>user\n" + question[:-7] + "<end_of_turn>\n" + "<start_of_turn>model\nAnswer: <b>"
 
-            elif "phi" in self.llm_name.lower():
-                prompt = [{"role": "system", "content": self.system_prompt_without_rag}] + \
-                [{"role": "user", "content": question[:-7]}] + \
-                [{"role": "assistant", "content": "Answer: "}]
-                prompt_in_template = self.tokenizer.apply_chat_template(prompt, tokenize=False)[len("<|endoftext|>"):-len(f"<|end|>\n<|endoftext|>\n")]
-                
-            elif "qwen" in self.llm_name.lower():
-                prompt = [{"role": "system", "content": self.system_prompt_without_rag}] + \
-                [{"role": "user", "content": question[:-7]}] + \
-                [{"role": "assistant", "content": "Answer: "}]
-                prompt_in_template = self.tokenizer.apply_chat_template(prompt, tokenize=False)[:-len(f"<|im_end|>\n")]
-                
-
-            elif "llama-2" in self.llm_name.lower():
-                prompt = [{"role": "system", "content": self.system_prompt_without_rag}] + \
-                [{"role": "user", "content": question[:-7]}] + \
-                [{"role": "assistant", "content": "Answer: "}]
-                prompt_in_template = self.tokenizer.apply_chat_template(prompt, tokenize=False)[:-len(f"</s>")]
-
-            elif "mistral" in self.llm_name.lower():
-                prompt = [{"role": "system", "content": self.system_prompt_without_rag}] + \
-                [{"role": "user", "content": question[:-7]}] + \
-                [{"role": "assistant", "content": "Answer: "}]
-                prompt_in_template = self.tokenizer.apply_chat_template(prompt, tokenize=False)[:-len("</s>")]
-
-
-        else:
-            if "gemma-1" in self.llm_name.lower():
-                prompt_in_template = "<bos><start_of_turn>system\n" + self.system_prompt_with_rag + "<end_of_turn>\n" + \
-                        "<start_of_turn>user\n" + context + "<end_of_turn>\n" + \
-                        "<start_of_turn>user\n" + question[:-7] + "<end_of_turn>\n" + "<start_of_turn>model\nAnswer: <b>"
-
-            elif "phi" in self.llm_name.lower():
-                prompt = [{"role": "system", "content": self.system_prompt_with_rag}] + \
-                [{"role": "user", "content": context}] + \
-                [{"role": "user", "content": question[:-7]}] + \
-                [{"role": "assistant", "content": "Answer: "}]
-                prompt_in_template = self.tokenizer.apply_chat_template(prompt, tokenize=False)[len("<|endoftext|>"):-len(f"<|end|>\n<|endoftext|>\n")]
+        elif "phi" in self.llm_name.lower():
+            prompt = [{"role": "system", "content": self.system_prompt_with_rag}] + \
+            [{"role": "user", "content": context}] + \
+            [{"role": "user", "content": question[:-7]}] + \
+            [{"role": "assistant", "content": "Answer: "}]
+            prompt_in_template = self.tokenizer.apply_chat_template(prompt, tokenize=False)[len("<|endoftext|>"):-len(f"<|end|>\n<|endoftext|>\n")]
+        
+        elif "qwen" in self.llm_name.lower():
+            prompt = [{"role": "system", "content": self.system_prompt_with_rag}] + \
+            [{"role": "user", "content": context}] + \
+            [{"role": "user", "content": question[:-7]}] + \
+            [{"role": "assistant", "content": "Answer: "}]
+            prompt_in_template = self.tokenizer.apply_chat_template(prompt, tokenize=False)[:-len(f"<|im_end|>\n")]
             
-            elif "qwen" in self.llm_name.lower():
-                prompt = [{"role": "system", "content": self.system_prompt_with_rag}] + \
-                [{"role": "user", "content": context}] + \
-                [{"role": "user", "content": question[:-7]}] + \
-                [{"role": "assistant", "content": "Answer: "}]
-                prompt_in_template = self.tokenizer.apply_chat_template(prompt, tokenize=False)[:-len(f"<|im_end|>\n")]
-                
-            elif "llama-2" in self.llm_name.lower():
-                prompt_in_template = "<s>[INST] <<SYS>>\n" + self.system_prompt_with_rag + "\n<</SYS>>" + \
-                                    context + \
-                                     "<|user|>\n" + question[:-7] + " [/INST] Answer: "
-            
-            elif "mistral" in self.llm_name.lower():
-                prompt_in_template = "<s>[INST] " + self.system_prompt_with_rag + " [/INST] \n[INST]" + \
-                             context + \
-                             " [/INST] \n[INST]" + question[:-7] + " [/INST] \nAnswer: "
+        elif "llama-2" in self.llm_name.lower():
+            prompt_in_template = "<s>[INST] <<SYS>>\n" + self.system_prompt_with_rag + "\n<</SYS>>" + \
+                                context + \
+                                    "<|user|>\n" + question[:-7] + " [/INST] Answer: "
+        
+        elif "mistral" in self.llm_name.lower():
+            prompt_in_template = "<s>[INST] " + self.system_prompt_with_rag + " [/INST] \n[INST]" + \
+                            context + \
+                            " [/INST] \n[INST]" + question[:-7] + " [/INST] \nAnswer: "
 
 
         prob = self.output_logit(prompt_in_template)
@@ -228,7 +197,6 @@ class MedRAG:
             question_doc = eval_dataset[ques_idx]
           
             answer, snippets, scores= self.answermultiplechoice(question_doc=question_doc, k=snippetsNumber)
-
             llm_ans_buf.append(answer)
             
     
@@ -241,21 +209,24 @@ class MedRAG:
             "dataset": dataset_name,
             "corpus": self.corpus_name,
             "retriever": self.retriever_name,
-            "use_rag": "yes" if self.rag else "no",
-            "snippetsNumber": snippetsNumber if self.rag else 0,
+            "use_rag": "yes",
+            "snippetsNumber": snippetsNumber,
             "accuracy": acc_score,
             "pred_ans": llm_ans_buf,
             "golden_ans": eval_dataset["cop"],
         }
 
         model_name = self.llm_name.replace("/", "-")
-        if self.rag:
-            results_fname = f"model_{model_name}_dataset_{dataset_name}_corpus_{self.corpus_name}_retriever_{self.retriever_name}_snippetNum_{snippetsNumber}.json"
+        results_fname = f"model_{model_name}_dataset_{dataset_name}_corpus_{self.corpus_name}_retriever_{self.retriever_name}_snippetNum_{snippetsNumber}.json"
         
-        else:
-            results_fname = f"model_{model_name}_dataset_{dataset_name}_withoutRAG.json"
+        # Construct the relative path to the results directory
+        script_dir = os.path.dirname(os.path.abspath(__file__))  # Directory of the current script
+        results_dir = os.path.join(script_dir, "..", "results")  # Going one level up to project root and then to results directory
+        if not os.path.exists(results_dir):
+            os.makedirs(results_dir)  # Create the results directory if it does not exist
 
-        with open(f"results/{results_fname}", "w") as f:
+        results_path = os.path.join(results_dir, results_fname)
+        with open(results_path, "w") as f:
             json.dump(results, f, indent=4)
 
         return acc_score
