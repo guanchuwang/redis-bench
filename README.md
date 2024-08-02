@@ -3,6 +3,7 @@
 This is the official codebase of paper _Assessing and Enhancing Large Language Models in Rare Disease Question-answering_.
 
 ## Dataset Overview
+<img width="700" height="290" src="./figures/disease_freq.png">
 
 
 
