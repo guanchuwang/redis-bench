@@ -1,6 +1,5 @@
-# Assessing and Enhancing Large Language Models in Rare Disease Question-answering
+# Assessing and Enhancing Large Language Models in Rare Disease Question-answering <img width="30" height="30" src="./figures/logo.png">
 
-<img width="50" height="50" src="./figures/logo.png">
 
 This is the official codebase of paper _Assessing and Enhancing Large Language Models in Rare Disease Question-answering_.
 
