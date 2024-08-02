@@ -3,8 +3,15 @@
 This is the official codebase of paper _Assessing and Enhancing Large Language Models in Rare Disease Question-answering_.
 
 ## Dataset Overview
+
+ReDis-QA dataset widely covers 205 types of rare diseases, where the most frequent disease features over 100 questions.
+
 <img width="900" height="260" src="https://github.com/guanchuwang/redis-bench/blob/main/figures/disease_freq.png">
-<img width="260" height="260" src="https://github.com/guanchuwang/redis-bench/blob/main/figures/theme_ratio.png">
+
+ReDis-QA dataset includes 11\%, 33\%, 13\%, 15\%, 18\% of the questions corresponding to the symptoms, causes, affects, related-disorders, diagnosis of rare diseases, respectively. 
+The remaining 9\% of the questions pertain to other properties of the diseases.
+
+<img width="400" height="290" src="https://github.com/guanchuwang/redis-bench/blob/main/figures/theme_ratio.png">
 
 
 ## Dependency
