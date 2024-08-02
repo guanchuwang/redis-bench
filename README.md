@@ -54,10 +54,15 @@ The accuracy of LLMs on each subset of properties is shown as follows:
 
 <img width="600" height="290" src="https://github.com/guanchuwang/redis-bench/blob/main/figures/llm_results.png">
 
-Run RAG with ReCOP corpus on the ResDis-QA dataset:
+Run RAG with ReCOP corpus using the meta-data retriever on the ResDis-QA dataset:
 ```bash
 cd meta-data-bench
 bash ./scripts/run_exp.sh
+```
+
+Run RAG with ReCOP and baseline corpora using MedCPT/BM25 retriever on the ResDis-QA dataset:
+```bash
+bash rag-bench/scripts/run_exp.sh
 ```
 
 The accuracy of RAG with ReCOP corpus is shown as follows:
