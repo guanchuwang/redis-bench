@@ -3,10 +3,10 @@
 This is the official codebase of paper _Assessing and Enhancing Large Language Models in Rare Disease Question-answering_.
 
 ## Dataset Overview
-<img width="900" height="290" src="./figures/disease_freq.png">
+<img width="900" height="260" src="./figures/disease_freq.png">
 
-<img width="290" height="290" src="./figures/theme_ratio.png">
-&nbsp;<img width="600" height="290" src="./figures/llm_results.png">
+<img width="260" height="260" src="./figures/theme_ratio.png">
+<img width="500" height="260" src="./figures/llm_results.png">
 
 
 ## Dependency
