@@ -11,7 +11,7 @@ This is the official codebase of paper _Assessing and Enhancing Large Language M
 
 :books: We have released our benchmark dataset [ReDis-QA]() and corpus for RAG [ReCOP]() <img width="15" height="15" src="./figures/logo.png">!
 
-:books: Baseline corpus: [PubMed](https://huggingface.co/datasets/MedRAG/pubmed), [Textbook](https://huggingface.co/datasets/MedRAG/textbooks), [Wikipedia](https://huggingface.co/datasets/MedRAG/wikipedia) and [Textbook](https://huggingface.co/datasets/MedRAG/statpearls)!
+:books: Baseline corpus: [PubMed](https://huggingface.co/datasets/MedRAG/pubmed), [Textbook](https://huggingface.co/datasets/MedRAG/textbooks), [Wikipedia](https://huggingface.co/datasets/MedRAG/wikipedia) and [StatPearls](https://huggingface.co/datasets/MedRAG/statpearls)!
 
 
 
@@ -24,7 +24,7 @@ ReDis-QA dataset widely covers 205 types of rare diseases, where the most freque
 ReDis-QA dataset includes 11\%, 33\%, 13\%, 15\%, 18\% of the questions corresponding to the symptoms, causes, affects, related-disorders, diagnosis of rare diseases, respectively. 
 The remaining 9\% of the questions pertain to other properties of the diseases.
 
-<img width="400" height="290" src="https://github.com/guanchuwang/redis-bench/blob/main/figures/theme_ratio.png">
+<img width="400" height="290" src="./figures/theme_ratio.png">
 
 
 ## Dependency
@@ -62,4 +62,22 @@ The accuracy of RAG with ReCOP corpus is shown as follows:
 
 <img width="200" height="200" src="./figures/radar_Mistral-7B-v0.2.png">&nbsp;<img width="200" height="200" src="./figures/radar_Gemma-1.1-7B.png">&nbsp;<img width="200" height="200" src="./figures/radar_Phi-3-7B.png">&nbsp;<img width="200" height="200" src="./figures/radar_Qwen-2-7B.png">
 
+Run RAG with baseline corpus and combine with ReCOP on the ResDis-QA dataset:
+```bash
 
+```
+
+<img width="200" height="200" src="./figures/radar_PubMed.png">&nbsp;<img width="200" height="200" src="./figures/radar_Textbooks.png">&nbsp;<img width="200" height="200" src="./figures/radar_Wikipedia.png">&nbsp;<img width="200" height="200" src="./figures/radar_StatPearls.png">
+
+# Acknowledgement
+
+The MedCPT, BM25 retrievers, and baseline corpus are sourced from the opensource repo [MedRAG](https://github.com/Teddy-XiongGZ/MedRAG). 
+Thanks to their contributions to the community!
+
+# Cite This Work
+
+If you find this work useful, you may cite this work:
+
+@article{
+    year={2024}
+}
