@@ -9,9 +9,11 @@ This is the official codebase of paper _Assessing and Enhancing Large Language M
 
 :mega: We have released our [paper]() and source code of ReDis-QA-Bench!
 
-:books: We have released our benchmark dataset [ReDis-QA]() and corpus for RAG [ReCOP]() <img width="15" height="15" src="./figures/logo.png">!
+:orange_book: We have released our benchmark dataset [ReDis-QA]()!
 
-:books: Baseline corpus: [PubMed](https://huggingface.co/datasets/MedRAG/pubmed), [Textbook](https://huggingface.co/datasets/MedRAG/textbooks), [Wikipedia](https://huggingface.co/datasets/MedRAG/wikipedia) and [StatPearls](https://huggingface.co/datasets/MedRAG/statpearls)!
+:closed_book: We have released our corpus for RAG [ReCOP]() <img width="15" height="15" src="./figures/logo.png">!
+
+:blue_book: Baseline corpus refers to [PubMed](https://huggingface.co/datasets/MedRAG/pubmed), [Textbook](https://huggingface.co/datasets/MedRAG/textbooks), [Wikipedia](https://huggingface.co/datasets/MedRAG/wikipedia) and [StatPearls](https://huggingface.co/datasets/MedRAG/statpearls)!
 
 
 
@@ -69,12 +71,12 @@ Run RAG with baseline corpus and combine with ReCOP on the ResDis-QA dataset:
 
 <img width="200" height="200" src="./figures/radar_PubMed.png">&nbsp;<img width="200" height="200" src="./figures/radar_Textbooks.png">&nbsp;<img width="200" height="200" src="./figures/radar_Wikipedia.png">&nbsp;<img width="200" height="200" src="./figures/radar_StatPearls.png">
 
-# Acknowledgement
+## Acknowledgement
 
 The MedCPT, BM25 retrievers, and baseline corpus are sourced from the opensource repo [MedRAG](https://github.com/Teddy-XiongGZ/MedRAG). 
 Thanks to their contributions to the community!
 
-# Cite This Work
+## Cite This Work
 
 If you find this work useful, you may cite this work:
 
