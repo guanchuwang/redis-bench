@@ -1,11 +1,11 @@
-# Assessing and Enhancing Large Language Models in Rare Disease Question-answering <img width="30" height="30" src="./figures/logo.png">
+# <img width="30" height="30" src="./figures/logo.png"> Assessing and Enhancing Large Language Models in Rare Disease Question-answering
 
 
 This is the official codebase of paper _Assessing and Enhancing Large Language Models in Rare Disease Question-answering_.
 
 
 ## Resources
-:star2: Please star our repo to follow the latest updates on ReDis-QA-Bench <img width="15" height="15" src="./figures/logo.png">!
+:star2: Please star our repo to follow the latest updates on <img width="15" height="15" src="./figures/logo.png"> ReDis-QA-Bench!
 
 :mega: We have released our [paper]() and source code of ReDis-QA-Bench!
 
