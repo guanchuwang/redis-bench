@@ -46,8 +46,7 @@ tqdm
 
 Run LLMs w/o RAG on the ResDis-QA dataset:
 ```bash
-cd zero-shot-bench
-bash ./scripts/run_exp.sh
+bash zero-shot-bench/scripts/run_exp.sh
 ```
 
 The accuracy of LLMs on each subset of properties is shown as follows:
@@ -56,8 +55,7 @@ The accuracy of LLMs on each subset of properties is shown as follows:
 
 Run RAG with ReCOP corpus using the meta-data retriever on the ResDis-QA dataset:
 ```bash
-cd meta-data-bench
-bash ./scripts/run_exp.sh
+bash meta-data-bench/scripts/run_exp.sh
 ```
 
 Run RAG with ReCOP and baseline corpora using MedCPT/BM25 retriever on the ResDis-QA dataset:
@@ -71,7 +69,7 @@ The accuracy of RAG with ReCOP corpus is shown as follows:
 
 Run RAG with baseline corpus and combine with ReCOP on the ResDis-QA dataset:
 ```bash
-
+bash combine-corpora-bench/scripts/run_exp.sh
 ```
 
 <img width="200" height="200" src="./figures/radar_PubMed.png">&nbsp;<img width="200" height="200" src="./figures/radar_Textbooks.png">&nbsp;<img width="200" height="200" src="./figures/radar_Wikipedia.png">&nbsp;<img width="200" height="200" src="./figures/radar_StatPearls.png">

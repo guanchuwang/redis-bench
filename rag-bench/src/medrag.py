@@ -27,8 +27,8 @@ from sklearn.metrics import accuracy_score
 
 class MedRAG:
 
-    def __init__(self, llm_name=None, retriever_name="MedCPT", corpus_name="Textbooks", db_dir="./corpus", cache_dir=None, hf_access_token="Your HF access token"):
-        self.llm_name = llm_name
+    def __init__(self, model_id=None, retriever_name="MedCPT", corpus_name="Textbooks", db_dir="./corpus", cache_dir=None, hf_access_token="Your HF access token"):
+        self.model_id = model_id
         self.retriever_name = retriever_name
         self.corpus_name = corpus_name
         self.db_dir = db_dir
@@ -37,33 +37,33 @@ class MedRAG:
         self.system_prompt_without_rag = "You are a helpful medical expert, and your task is to answer a multi-choice medical question. Please first choose the answer from the provided options and then provide the explanation."
         self.system_prompt_with_rag = "You are a helpful medical expert, and your task is to answer a multi-choice medical question using the relevant documents. Please first choose the answer from the provided options and then provide the explanation."
         self.retrieval_system = RetrievalSystem(self.retriever_name, self.corpus_name, self.db_dir)
-        self.tokenizer = AutoTokenizer.from_pretrained(self.llm_name, cache_dir=self.cache_dir, token=self.access_token, trust_remote_code=True)
+        self.tokenizer = AutoTokenizer.from_pretrained(self.model_id, cache_dir=self.cache_dir, token=self.access_token, trust_remote_code=True)
         self.tokenizer.padding_side = "left"
 
-        if "mistral" in llm_name.lower():
+        if "mistral" in model_id.lower():
             self.max_length = 32678
             self.context_length = 32678
-        elif "llama-3" in llm_name.lower():
+        elif "llama-3" in model_id.lower():
             self.max_length = 8192
             self.context_length = 8192
-        elif "llama-2" in llm_name.lower():
+        elif "llama-2" in model_id.lower():
             self.max_length = 4096
             self.context_length = 4096
-        elif "gemma-2" in llm_name.lower():
+        elif "gemma-2" in model_id.lower():
             self.max_length = 8192
             self.context_length = 8192
-        elif "gemma-1" in llm_name.lower():
+        elif "gemma-1" in model_id.lower():
             self.max_length = 8192
             self.context_length = 8192
-        elif "qwen" in llm_name.lower():
+        elif "qwen" in model_id.lower():
             self.max_length = 131072
             self.context_length = 131072
-        elif "phi-3" in llm_name.lower():
+        elif "phi-3" in model_id.lower():
             self.max_length = 8192
             self.context_length = 8192
 
         self.llm = AutoModelForCausalLM.from_pretrained(
-                    self.llm_name,
+                    self.model_id,
                     device_map="auto",
                     torch_dtype=torch.bfloat16,
                     attn_implementation="flash_attention_2",
@@ -150,39 +150,39 @@ class MedRAG:
             
 
         # generate answers
-        if "gemma-1" in self.llm_name.lower():
+        if "gemma-1" in self.model_id.lower():
             prompt_in_template = "<bos><start_of_turn>system\n" + self.system_prompt_with_rag + "<end_of_turn>\n" + \
                     "<start_of_turn>user\n" + context + "<end_of_turn>\n" + \
                     "<start_of_turn>user\n" + question[:-7] + "<end_of_turn>\n" + "<start_of_turn>model\nAnswer: <b>"
 
-        elif "phi" in self.llm_name.lower():
+        elif "phi" in self.model_id.lower():
             prompt = [{"role": "system", "content": self.system_prompt_with_rag}] + \
             [{"role": "user", "content": context}] + \
             [{"role": "user", "content": question[:-7]}] + \
             [{"role": "assistant", "content": "Answer: "}]
             prompt_in_template = self.tokenizer.apply_chat_template(prompt, tokenize=False)[len("<|endoftext|>"):-len(f"<|end|>\n<|endoftext|>\n")]
         
-        elif "qwen" in self.llm_name.lower():
+        elif "qwen" in self.model_id.lower():
             prompt = [{"role": "system", "content": self.system_prompt_with_rag}] + \
             [{"role": "user", "content": context}] + \
             [{"role": "user", "content": question[:-7]}] + \
             [{"role": "assistant", "content": "Answer: "}]
             prompt_in_template = self.tokenizer.apply_chat_template(prompt, tokenize=False)[:-len(f"<|im_end|>\n")]
             
-        elif "llama-2" in self.llm_name.lower():
+        elif "llama-2" in self.model_id.lower():
             prompt_in_template = "<s>[INST] <<SYS>>\n" + self.system_prompt_with_rag + "\n<</SYS>>" + \
                                 context + \
                                     "<|user|>\n" + question[:-7] + " [/INST] Answer: "
         
-        elif "mistral" in self.llm_name.lower():
+        elif "mistral" in self.model_id.lower():
             prompt_in_template = "<s>[INST] " + self.system_prompt_with_rag + " [/INST] \n[INST]" + \
                             context + \
                             " [/INST] \n[INST]" + question[:-7] + " [/INST] \nAnswer: "
 
 
-        prob = self.output_logit(prompt_in_template)
-        answer = int(prob.argmax(-1))
-        return answer, retrieved_snippets, scores
+        probs = self.output_logit(prompt_in_template)
+        answer = int(probs.argmax(-1))
+        return answer, retrieved_snippets, scores, probs.detach().numpy()
 
     
  
@@ -196,7 +196,7 @@ class MedRAG:
         for ques_idx in tqdm(range(dataset_size)):
             question_doc = eval_dataset[ques_idx]
           
-            answer, snippets, scores= self.answermultiplechoice(question_doc=question_doc, k=snippetsNumber)
+            answer, snippets, scores, probs= self.answermultiplechoice(question_doc=question_doc, k=snippetsNumber)
             llm_ans_buf.append(answer)
             
     
@@ -205,7 +205,7 @@ class MedRAG:
 
         
         results = {
-            "model": self.llm_name,
+            "model": self.model_id,
             "dataset": dataset_name,
             "corpus": self.corpus_name,
             "retriever": self.retriever_name,
@@ -216,7 +216,7 @@ class MedRAG:
             "golden_ans": eval_dataset["cop"],
         }
 
-        model_name = self.llm_name.replace("/", "-")
+        model_name = self.model_id.replace("/", "-")
         results_fname = f"model_{model_name}_dataset_{dataset_name}_corpus_{self.corpus_name}_retriever_{self.retriever_name}_snippetNum_{snippetsNumber}.json"
         
         # Construct the relative path to the results directory
