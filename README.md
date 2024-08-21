@@ -84,8 +84,13 @@ Thanks to their contributions to the community!
 If you find this work useful, you may cite this work:
 
 @article{wang2024assessing,
+
   title={Assessing and Enhancing Large Language Models in Rare Disease Question-answering},
+  
   author={Wang, Guanchu and Ran, Junhao and Tang, Ruixiang and Chang, Chia-Yuan and Chuang, Yu-Neng and Liu, Zirui and Braverman, Vladimir and Liu, Zhandong and Hu, Xia},
+  
   journal={arXiv preprint arXiv:2408.08422},
+  
   year={2024}
+  
 }
