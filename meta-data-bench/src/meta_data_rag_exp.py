@@ -7,7 +7,7 @@ def main():
     parser.add_argument('--dataset_dir', type=str, default="/home/gw22/python_project/rare_disease_dataset/data_clean/data/ReDisQA_v2", help='Directory of the dataset to evaluate')
     parser.add_argument('--model_id', type=str, default='google/gemma-1.1-7b-it', help='ID of the model to use')
     parser.add_argument('--corpus_dir', type=str, default="/home/gw22/python_project/rare_disease_dataset/corpus/data/nord_corpus_v2", help='Directory of the corpus data')
-    parser.add_argument('--access_token', type=str, default="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", help='Hugging Face access token')
+    parser.add_argument('--access_token', type=str, help='Hugging Face access token')
     args = parser.parse_args()
 
     agent = MetaDataRAG(
