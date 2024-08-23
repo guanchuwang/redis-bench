@@ -22,6 +22,8 @@ import torch
 import tqdm
 import numpy as np
 import time
+import pandas as pd
+
 
 corpus_names = {
     "PubMed": ["pubmed"],
@@ -132,7 +134,41 @@ class Retriever:
                 os.system("wget https://ftp.ncbi.nlm.nih.gov/pub/litarch/3d/12/statpearls_NBK430685.tar.gz -P {:s}".format(os.path.join(self.db_dir, self.corpus_name)))
                 os.system("tar -xzvf {:s} -C {:s}".format(os.path.join(db_dir, self.corpus_name, "statpearls_NBK430685.tar.gz"), os.path.join(self.db_dir, self.corpus_name)))
                 print("Chunking the statpearls corpus...")
-                os.system("python src/data/statpearls.py")
+                os.system("python ../data/statpearls.py")
+            elif self.corpus_name == "raredisease":
+                print("Downloading the raredisease corpus")
+                os.system("git clone  https://huggingface.co/datasets/guan-wang/ReCOP {:s}".format(os.path.join(self.db_dir, self.corpus_name)))
+                print("Chunking the raredisease corpus...")
+                # Load the parquet file into a DataFrame
+                parquet_file = os.path.join(db_dir, self.corpus_name, 'data', 'train-00000-of-00001.parquet')
+                df = pd.read_parquet(parquet_file)
+
+                # Path to save the .jsonl files
+                output_dir = os.path.join(db_dir, corpus_name, 'chunk')
+                os.makedirs(output_dir, exist_ok=True)
+
+                # Aggregate data by 'nordid'
+                aggregated_data = {}
+                for _, row in df.iterrows():
+                    nordid = row['nordid']
+                    if nordid not in aggregated_data:
+                        aggregated_data[nordid] = []
+                    chunk = {
+                        'id': row['id'],
+                        'title': row['title'],
+                        'content': row['content'],
+                        'contents': row['contents']
+                    }
+                    aggregated_data[nordid].append(chunk)
+
+                # Save each 'nordid' data to a separate JSONL file
+                for nordid, chunks in aggregated_data.items():
+                    output_file_path = os.path.join(output_dir, f'nordid_{nordid}.jsonl')
+                    with open(output_file_path, 'w') as f:
+                        for chunk in chunks:
+                            f.write(json.dumps(chunk) + "\n")
+
+            
 
         # Create the index directory
         self.index_dir = os.path.join(self.db_dir, self.corpus_name, "index", self.retriever_name.replace("Query-Encoder", "Article-Encoder"))

@@ -19,7 +19,7 @@ from tqdm import tqdm
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from utils import RetrievalSystem
-from datasets import load_from_disk
+from datasets import load_from_disk, load_dataset
 from sklearn.metrics import accuracy_score
 
 
@@ -34,7 +34,6 @@ class MedRAG:
         self.db_dir = db_dir
         self.cache_dir = cache_dir
         self.access_token = hf_access_token
-        self.system_prompt_without_rag = "You are a helpful medical expert, and your task is to answer a multi-choice medical question. Please first choose the answer from the provided options and then provide the explanation."
         self.system_prompt_with_rag = "You are a helpful medical expert, and your task is to answer a multi-choice medical question using the relevant documents. Please first choose the answer from the provided options and then provide the explanation."
         self.retrieval_system = RetrievalSystem(self.retriever_name, self.corpus_name, self.db_dir)
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_id, cache_dir=self.cache_dir, token=self.access_token, trust_remote_code=True)
@@ -117,7 +116,6 @@ class MedRAG:
     
     def num_tokens(self, text):
         """Return the number of tokens in a string."""
-        # ipdb.set_trace()
         encoding = self.tokenizer(text, padding=False, return_tensors="pt")
         return encoding.input_ids.shape[-1]
     
@@ -188,7 +186,7 @@ class MedRAG:
  
 
     def evaluate(self, dataset_name = "ReDisQA_v2", snippetsNumber = 7):
-        eval_dataset = load_from_disk(f"/home/gw22/python_project/rare_disease_dataset/data_clean/data/{dataset_name}")
+        eval_dataset = load_dataset("guan-wang/ReDis-QA")['test'] 
         dataset_size = len(eval_dataset["cop"])
         llm_ans_buf = []
         

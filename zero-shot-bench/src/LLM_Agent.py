@@ -5,9 +5,10 @@ import numpy as np
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import argparse
 import sys
-from datasets import load_from_disk
+from datasets import load_dataset
 from sklearn.metrics import accuracy_score
 from tqdm import tqdm
+
 
 
 
@@ -83,8 +84,8 @@ class LLM_Agent:
         answer = int(probs.argmax(-1))
         return answer, probs.detach().numpy()
 
-    def evaluate(self, dataset_dir):
-        eval_dataset = load_from_disk(f"{dataset_dir}")        
+    def evaluate(self):
+        eval_dataset = load_dataset("guan-wang/ReDis-QA")['test']     
         dataset_size = len(eval_dataset)
         llm_ans_buf = []
 

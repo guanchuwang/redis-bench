@@ -5,6 +5,7 @@ import numpy as np
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import argparse
 import sys
+from datasets import load_dataset
 from datasets import load_from_disk
 from sklearn.metrics import accuracy_score
 from tqdm import tqdm
@@ -14,7 +15,7 @@ from tqdm import tqdm
 
 class MetaDataRAG:
 
-    def __init__(self, model_id = "mistralai/Mistral-7B-Instruct-v0.2", access_token = "Your HF Token here", corpus_dir="../corpus/data/nord_corpus_v2"):
+    def __init__(self, model_id = "mistralai/Mistral-7B-Instruct-v0.2", access_token = "Your HF Token here"):
         self.model_id = model_id
         tokenizer_id = model_id
         self.tokenizer = AutoTokenizer.from_pretrained(tokenizer_id, token=access_token, trust_remote_code=True)
@@ -33,7 +34,7 @@ class MetaDataRAG:
         self.D_ids = self.tokenizer("D").input_ids[-1]
         self.system_prompt = 'You are a helpful medical expert, and your task is to answer a multi-choice medical question using the relevant documents. Please first choose the answer from the provided options and then provide the explanation.'
        
-        self.corpus = load_from_disk(f"{corpus_dir}")
+        self.corpus = load_dataset("guan-wang/ReCOP")['train']
         self.corpus_contents = np.array(self.corpus["contents"])
         self.corpus_title = np.array(self.corpus["rare-disease"])
 
@@ -106,8 +107,8 @@ class MetaDataRAG:
         answer = int(probs.argmax(-1))
         return answer, probs.detach().numpy()
 
-    def evaluate(self, dataset_dir, retrieved_doc_num):
-        eval_dataset = load_from_disk(f"{dataset_dir}")        
+    def evaluate(self, retrieved_doc_num):
+        eval_dataset = load_dataset("guan-wang/ReDis-QA")['test'] 
         dataset_size = len(eval_dataset)
         llm_ans_buf = []
 
@@ -145,21 +146,4 @@ class MetaDataRAG:
         return acc_score
 
 
-def main():
-    parser = argparse.ArgumentParser(description='PyTorch ImageNet Training')
-    parser.add_argument('--k', default=5, type=int)
-    args = parser.parse_args()
 
-    access_token = "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"
-    # dataset_name = "ReDisQA_v2"
-    model_id = "google/gemma-1.1-7b-it"
-    retrieved_doc_num = args.k
-    # corpus_dir = "../corpus/data/nord_corpus_v2/"
-
-    agent = MetaDataRAG(model_id, access_token)
-    accuracy = agent.evaluate(retrieved_doc_num)
-    print(f"Evaluation completed with accuracy: {accuracy}")
-
-
-if __name__ == "__main__":
-    main()

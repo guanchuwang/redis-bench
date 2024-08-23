@@ -2,7 +2,7 @@ import sys
 import os
 import scipy.stats as stats
 import numpy as np
-from datasets import load_from_disk
+from datasets import load_from_disk, load_dataset
 from tqdm import tqdm
 from sklearn.metrics import accuracy_score
 import json
@@ -23,9 +23,9 @@ from MetaDataRAG import MetaDataRAG
 from medrag import MedRAG
 
 class CombineCorporaRAG:
-    def __init__(self, model_id="mistralai/Mistral-7B-Instruct-v0.2", combined_retriever_name="MedCPT", combined_corpus_name="Textbooks", hf_access_token="Your HF access token", ReCOP_corpus_dir = "nord_corpus_v2"):
+    def __init__(self, model_id="mistralai/Mistral-7B-Instruct-v0.2", combined_retriever_name="MedCPT", combined_corpus_name="Textbooks", hf_access_token="Your HF access token"):
         self.combined_medrag = MedRAG(model_id=model_id, retriever_name=combined_retriever_name, corpus_name=combined_corpus_name,  hf_access_token=hf_access_token)
-        self.metadata_rag = MetaDataRAG(model_id = model_id, access_token = hf_access_token, corpus_dir = ReCOP_corpus_dir)
+        self.metadata_rag = MetaDataRAG(model_id=model_id, access_token=hf_access_token)
         self.model_id = model_id
         self.combined_retriever_name = combined_retriever_name
         self.combined_corpus_name = combined_corpus_name
@@ -44,7 +44,7 @@ class CombineCorporaRAG:
             return medrag_answer
         
     def evaluate(self, dataset_name = "ReDisQA_v2", snippetsNumber = 7):
-        eval_dataset = load_from_disk(f"/home/gw22/python_project/rare_disease_dataset/data_clean/data/{dataset_name}")
+        eval_dataset = load_dataset("guan-wang/ReDis-QA")['test'] 
         dataset_size = len(eval_dataset["cop"])
         llm_ans_buf = []
         
