@@ -1,0 +1,9 @@
+numpy
+scikit-learn
+accelerate==0.32.1
+transformers==4.42.4
+datasets==2.20.0
+flash-attn
+tqdm
+faiss-cpu==1.7.4
+sentence_transformers==2.2.2

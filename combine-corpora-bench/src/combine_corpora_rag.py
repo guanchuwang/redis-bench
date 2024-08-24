@@ -43,7 +43,7 @@ class CombineCorporaRAG:
         else:
             return medrag_answer
         
-    def evaluate(self, dataset_name = "ReDisQA_v2", snippetsNumber = 7):
+    def evaluate(self, dataset_name = "ReDisQA", snippetsNumber = 7):
         eval_dataset = load_dataset("guan-wang/ReDis-QA")['test'] 
         dataset_size = len(eval_dataset["cop"])
         llm_ans_buf = []

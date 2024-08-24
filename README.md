@@ -7,7 +7,7 @@ This is the official codebase of paper _Assessing and Enhancing Large Language M
 ## Resources
 :star2: Please star our repo to follow the latest updates on <img width="15" height="15" src="./figures/logo.png"> ReDis-QA-Bench!
 
-:mega: We have released our [paper]() and source code of ReDis-QA-Bench!
+:mega: We have released our [paper](https://arxiv.org/pdf/2408.08422) and source code of ReDis-QA-Bench!
 
 :orange_book: We have released our benchmark dataset [ReDis-QA](https://huggingface.co/datasets/guan-wang/ReDis-QA)!
 
@@ -29,20 +29,39 @@ The remaining 9\% of the questions pertain to other properties of the diseases.
 <img width="400" height="290" src="./figures/theme_ratio.png">
 
 
-## Dependency
-```
-numpy
-scikit-learn
-scipy
-torch
-accelerate==0.32.1
-transformers==4.42.4
-datasets==2.20.0
-ipdb
-tqdm
-```
+## Requirements
+
+1. **Python Environment**:  
+   - Create a virtual environment using Python 3.10.0.
+
+2. **PyTorch Installation**:  
+   - Install the version of PyTorch that is compatible with your system's CUDA version (e.g., PyTorch 2.4.0+cu121).
+
+3. **Additional Libraries**:  
+   - Install the remaining required libraries by running:
+     ```bash
+     pip install -r requirements.txt
+     ```
+
+4. **Git Large File Storage (Git LFS)**:  
+   - Git LFS is required to download and load large corpora Textbooks, Wikipedia, and PubMed for the first time. ReCOP downloading does not require Git LFS.
+
+5. **Java**:  
+   - Ensure Java is installed for using the BM25 retriever.
+
 
 ## Quick Exploration on the Benchmark
+
+Loading ReDis-QA Dataset:
+```bash
+from datasets import load_dataset
+eval_dataset = load_dataset("guan-wang/ReDis-QA")['test'] 
+```
+Loading ReCOP Corpus:
+```bash
+from datasets import load_dataset
+corpus = load_dataset("guan-wang/ReCOP")['train'] 
+```
 
 Run LLMs w/o RAG on the ResDis-QA dataset:
 ```bash
