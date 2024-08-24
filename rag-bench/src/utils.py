@@ -134,7 +134,8 @@ class Retriever:
                 os.system("wget https://ftp.ncbi.nlm.nih.gov/pub/litarch/3d/12/statpearls_NBK430685.tar.gz -P {:s}".format(os.path.join(self.db_dir, self.corpus_name)))
                 os.system("tar -xzvf {:s} -C {:s}".format(os.path.join(db_dir, self.corpus_name, "statpearls_NBK430685.tar.gz"), os.path.join(self.db_dir, self.corpus_name)))
                 print("Chunking the statpearls corpus...")
-                os.system("python ../data/statpearls.py")
+                os.system("python rag-bench/src/data/statpearls.py")
+
             elif self.corpus_name == "raredisease":
                 print("Downloading the raredisease corpus")
                 os.system("git clone  https://huggingface.co/datasets/guan-wang/ReCOP {:s}".format(os.path.join(self.db_dir, self.corpus_name)))
